@@ -18,6 +18,11 @@ stream.on('data',function(line){
       tableInfo[currentTable].fields.push(l)
     }
   }
+  if(currentTable && /^\) ENGINE=/.test(line)){
+    tableInfo[currentTable].loaded = true
+    console.log('db.createCollection(\'' + currentTable + '\')')
+    currentTable = false
+  }
   if(/^INSERT INTO /.test(line)){
     var table = line.replace(/^INSERT INTO `/,'').replace(/` VALUES.*$/,'')
     var values = line.replace(/^INSERT INTO .* VALUES \(/,'').replace(/\);$/,'')
@@ -32,10 +37,6 @@ stream.on('data',function(line){
       cmd = cmd + '})'
       console.log(cmd)
     })
-  }
-  if(/^\) ENGINE=/.test(line)){
-    tableInfo[currentTable].loaded = true
-    currentTable = false
   }
 })
 
